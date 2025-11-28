@@ -9,7 +9,6 @@ Steps:
 5. Evaluate models
 """
 
-import pandas as pd
 from src.preprocessing import preprocess_pipeline
 from src.features import feature_engineering_pipeline
 from src.train import train_models
@@ -25,14 +24,6 @@ def main():
     # 2. Feature engineering
     print("Applying feature engineering...")
     df = feature_engineering_pipeline(df)
-
-    # ✅ Extra step: drop or impute NaN values before training
-    print("Cleaning missing values...")
-    df = df.dropna()  # opción simple: eliminar filas con NaN
-    # Alternativa: imputar valores
-    # from sklearn.impute import SimpleImputer
-    # imputer = SimpleImputer(strategy="mean")
-    # df[df.columns] = imputer.fit_transform(df)
 
     # 3. Train models
     print("Training models...")

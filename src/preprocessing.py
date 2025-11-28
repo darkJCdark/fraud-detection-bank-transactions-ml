@@ -19,25 +19,33 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     - Convert date columns to datetime
     - Fix errors in 'is_fraud'
     - Cast columns to correct types
+    - Remove invalid or NaN rows in critical columns
     """
     # Convert dates
-    df['trans_date_trans_time'] = pd.to_datetime(df['trans_date_trans_time'], errors='coerce')
-    df['dob'] = pd.to_datetime(df['dob'], errors='coerce')
+    for col in ['trans_date_trans_time', 'dob']:
+        if col in df.columns:
+            df[col] = pd.to_datetime(df[col], errors='coerce')
 
-    # Fix errors in target column
-    df['is_fraud'] = df['is_fraud'].astype(str)
-    df.loc[df['is_fraud'].str.startswith('1'), 'is_fraud'] = 1
-    df.loc[df['is_fraud'].str.startswith('0'), 'is_fraud'] = 0
-    df['is_fraud'] = df['is_fraud'].astype(int)
+    # Derive is_fraud from type and isFraud
+    if 'type' in df.columns and 'isFraud' in df.columns:
+        df = df.dropna(subset=['type', 'isFraud'])
+        df['is_fraud'] = df['type'].isin(['TRANSFER', 'CASH_OUT']) & (df['isFraud'] == 1)
+        df['is_fraud'] = df['is_fraud'].astype(int)
+    elif 'is_fraud' in df.columns:
+        df['is_fraud'] = pd.to_numeric(df['is_fraud'], errors='coerce')
 
-    # Cast numeric columns
+    # Cast numeric columns safely
     float_cols = ['amt', 'lat', 'long', 'merch_lat', 'merch_long']
     for col in float_cols:
         if col in df.columns:
-            df[col] = df[col].astype(float)
+            df[col] = pd.to_numeric(df[col], errors='coerce')
 
     if 'city_pop' in df.columns:
-        df['city_pop'] = df['city_pop'].astype(int)
+        df['city_pop'] = pd.to_numeric(df['city_pop'], errors='coerce')
+
+    # Drop rows with NaN in critical columns
+    critical_cols = ['amt', 'is_fraud']
+    df = df.dropna(subset=[col for col in critical_cols if col in df.columns])
 
     return df
 
@@ -49,25 +57,17 @@ def transform_features(df: pd.DataFrame) -> pd.DataFrame:
     - Extract month from transaction date
     - Drop unnecessary columns
     """
-    # Age from dob
-    if 'dob' in df.columns:
+    if 'dob' in df.columns and 'trans_date_trans_time' in df.columns:
         df['edad'] = (df['trans_date_trans_time'] - df['dob']).dt.days // 365
         df = df.drop(columns='dob')
 
-    # Month from transaction date
     if 'trans_date_trans_time' in df.columns:
         df['trans_month'] = df['trans_date_trans_time'].dt.month
         df = df.drop(columns='trans_date_trans_time')
 
-    # Drop transaction ID (not predictive)
-    if 'trans_num' in df.columns:
-        df = df.drop(columns='trans_num')
-
-    # Drop highly correlated merchant coordinates
-    if 'merch_lat' in df.columns:
-        df = df.drop(columns='merch_lat')
-    if 'merch_long' in df.columns:
-        df = df.drop(columns='merch_long')
+    for col in ['trans_num', 'merch_lat', 'merch_long']:
+        if col in df.columns:
+            df = df.drop(columns=col)
 
     return df
 
@@ -76,9 +76,11 @@ def scale_numeric(df: pd.DataFrame) -> pd.DataFrame:
     """
     Scale numeric features using MinMaxScaler.
     """
-    num_cols = df.select_dtypes(include=['int64', 'float64']).columns.drop('is_fraud')
-    scaler = MinMaxScaler()
-    df[num_cols] = scaler.fit_transform(df[num_cols])
+    num_cols = df.select_dtypes(include=['int64', 'float64']).columns
+    num_cols = [col for col in num_cols if col != 'is_fraud']
+    if num_cols:
+        scaler = MinMaxScaler()
+        df[num_cols] = scaler.fit_transform(df[num_cols])
     return df
 
 
@@ -89,6 +91,7 @@ def encode_categorical(df: pd.DataFrame) -> pd.DataFrame:
     cat_cols = df.select_dtypes(include=['object', 'string']).columns
     le = LabelEncoder()
     for col in cat_cols:
+        df[col] = df[col].fillna("missing")
         df[col] = le.fit_transform(df[col])
     return df
 
