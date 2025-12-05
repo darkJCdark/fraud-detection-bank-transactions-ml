@@ -1,26 +1,31 @@
 # Fraud Detection in Banking Transactions using Machine Learning
 
-Este repositorio contiene el desarrollo de un modelo de machine learning para la detección de transacciones bancarias fraudulentas. 
-El proyecto aborda la problemática del fraude digital en entidades financieras, proponiendo un enfoque predictivo que supera las 
-limitaciones de los sistemas tradicionales basados en reglas.
+This repository contains the development of a machine learning model for detecting fraudulent banking transactions.  
+The project addresses the issue of digital fraud in financial institutions, proposing a predictive approach that surpasses the limitations of traditional rule-based systems.
 
-## Contenido
-- **Documentación académica**: Presentación y reporte del proyecto con contexto, objetivos, metodología, resultados y conclusiones.
-- **Código fuente (Python/Scikit-learn)**: Implementación del modelo con etapas de preprocesamiento, análisis de correlaciones, 
-  escalamiento de variables, codificación de atributos categóricos y entrenamiento de algoritmos.
-- **Modelos evaluados**: Regresión Logística y Random Forest, con optimización de hiperparámetros.
-- **Resultados**: El modelo Random Forest alcanzó un recall de 95%, detectando casi todos los casos de fraude en el dataset.
-- **Implicancias éticas**: Consideraciones sobre privacidad de datos, sesgos, transparencia y seguridad frente a ataques adversarios.
+---
 
-## Objetivo
-Desarrollar un sistema predictivo capaz de identificar patrones en transacciones bancarias y anticipar posibles fraudes, 
-reduciendo falsos negativos y fortaleciendo la confianza en los sistemas financieros.
+## Contents
+- **Academic documentation:** Project presentation and report including context, objectives, methodology, results, and conclusions.
+- **Source code (Python/Scikit-learn):** Implementation of the model with preprocessing steps, correlation analysis, variable scaling, categorical feature encoding, and algorithm training.
+- **Evaluated models:** Logistic Regression and Random Forest, with hyperparameter optimization.
+- **Results:** The Random Forest model achieved a recall of 95%, detecting almost all fraud cases in the dataset.
+- **Ethical implications:** Considerations regarding data privacy, bias, transparency, and security against adversarial attacks.
+
+---
+
+## Objective
+Develop a predictive system capable of identifying patterns in banking transactions and anticipating potential fraud,  
+reducing false negatives and strengthening trust in financial systems.
+
+---
 
 ## Dataset
-Se utilizó un conjunto de datos público (`fraud_data.csv`) con información de transacciones bancarias, incluyendo atributos 
-temporales, geográficos, demográficos y financieros.
+A public dataset (`fraud_data.csv`) was used, containing information on banking transactions, including temporal, geographic, demographic, and financial attributes.
 
-## Tecnologías utilizadas
+---
+
+## Technologies Used
 - Python (Pandas, NumPy, Scikit-learn, Seaborn, Matplotlib)
-- Algoritmos de clasificación supervisada
-- GridSearchCV para optimización de hiperparámetros
+- Supervised classification algorithms
+- GridSearchCV for hyperparameter optimization
